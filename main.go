@@ -119,6 +119,7 @@ func consume(addr string) {
 
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":               addr,
+		"security.protocol":               "SSL",
 		"session.timeout.ms":              6000,
 		"go.events.channel.enable":        true,
 		"group.id":                        1,
