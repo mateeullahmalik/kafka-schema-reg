@@ -17,10 +17,6 @@ import (
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
-const (
-	localMessage = "this is my test message"
-)
-
 func main() {
 	// create dummy login event
 	login := &v1.UserLoggedIn{
@@ -37,14 +33,16 @@ func main() {
 		},
 	}
 
-	testLocal(event, login.Uid)
+	//addr := "127.0.0.1:9092"
+	addr := "SSL://b-1.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,SSL://b-2.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,SSL://b-3.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094"
+	testLocal(event, login.Uid, addr)
+
 }
 
-func testLocal(obj *v1.UserAll, key string) {
+func testLocal(obj *v1.UserAll, key string, addr string) {
 	// docker-compose.yml can be used to run kafka cluster locally in a quick way
 	// command: docker-compose up -d
 	// this will run kafka cluster locally on localhost:9092
-	addr := "127.0.0.1:9092"
 
 	// create topic if not exists
 	createTopic(addr, "vl-user-dev")
@@ -54,7 +52,7 @@ func testLocal(obj *v1.UserAll, key string) {
 	post(p, obj, key)
 
 	// confirm delivery by producer  by consuming kafka topic
-	consume(addr)
+	//consume(addr)
 }
 
 func post(p bus.EventBus, obj *v1.UserAll, key string) {
@@ -75,7 +73,7 @@ func post(p bus.EventBus, obj *v1.UserAll, key string) {
 }
 
 func createTopic(addr, topic string) {
-	a, err := kafka.NewAdminClient(&kafka.ConfigMap{"bootstrap.servers": addr})
+	a, err := kafka.NewAdminClient(&kafka.ConfigMap{"bootstrap.servers": addr, "security.protocol": "SSL"})
 	if err != nil {
 		fmt.Printf("Failed to create Admin client: %s\n", err)
 		os.Exit(1)
