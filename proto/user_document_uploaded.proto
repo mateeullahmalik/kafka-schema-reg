@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+enum UserDocumentType {
+	PASSPORT = 0;
+	LICENCE_DRIVER = 1;
+}
+
+message UserDocumentUploaded {
+	string uid = 1; // User ID
+  string did = 2; // Document ID
+  string url = 3; // Url of the document
+	UserDocumentType doc_type = 4;
+	google.protobuf.Timestamp uploaded_ts = 5;
+}
+
+
+

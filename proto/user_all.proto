@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package v1;
+
+import "user_registered.proto";
+import "user_bet_made.proto";
+import "user_bonus_received.proto";
+import "user_document_uploaded.proto";
+import "user_hand_played.proto";
+import "user_money_deposited.proto";
+import "user_money_withdrawn.proto";
+import "user_table_started.proto";
+import "user_logged_in.proto";
+
+message UserAll {
+    oneof oneof_type {
+       UserRegistered registration = 1;
+       UserDocumentUploaded doc_upload = 2;
+       UserLoggedIn login = 3;
+       UserMoneyDeposited money_deposit = 4;
+       UserTableStarted table_start = 5;
+       UserHandPlayed hand_played = 6;
+       UserBetMade bet = 7;
+       UserMoneyWithdrawn money_withdraw = 8;
+       UserBonusReceived bonus_received = 9;
+    }
+}

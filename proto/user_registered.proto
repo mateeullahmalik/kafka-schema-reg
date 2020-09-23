@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+message UserContactInfo {
+	string email = 1;
+	int32 mobile = 2;
+}
+
+message UserAddressInfo {
+	string address_string = 1;
+	string city = 2;
+	string state = 3;
+	string country = 4; // ISO 3166 country codes
+}
+
+enum UserAccountStatus {
+	ACTIVE = 0;
+	INACTIVE = 1;
+	DISABLED = 2;
+	BLOCKED = 3;
+}
+
+message UserRegistered {
+  string uid = 1;
+	string first_name = 2;
+	string last_name = 3;
+	string username = 4;
+	google.protobuf.Timestamp date_of_birth = 5;
+	google.protobuf.Timestamp date_of_joining = 6;
+	UserContactInfo contact = 7;
+	UserAddressInfo address = 8;
+	string language = 11; // ISO 639-1 Language Codes
+	UserAccountStatus account_status = 12;
+}

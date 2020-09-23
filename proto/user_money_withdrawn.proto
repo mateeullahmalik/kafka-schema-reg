@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+message UserMoneyWithdrawn {
+  string uid = 1;
+	google.protobuf.Timestamp withdraw_at_ts = 2;
+	float amount = 3;
+}
+

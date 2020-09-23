@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+message UserLoggedIn {
+  string uid = 1;
+	google.protobuf.Timestamp logged_at_ts = 2;
+	string ip = 3;
+	string country = 4; // ISO 3166 country codes
+	float latitude = 5;
+	float longitude = 6;
+}
+

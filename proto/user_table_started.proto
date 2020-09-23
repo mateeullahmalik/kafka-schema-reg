@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+message UserTableStarted {
+  string uid = 1; // User ID
+  string tid = 2; // Table ID
+	google.protobuf.Timestamp started_at_ts = 3;
+	repeated string players = 4;
+}
+

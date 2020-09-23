@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+message UserBetMade {
+	string bid = 1; // Bet ID
+	string uid = 2; // User ID
+	string tid = 3; // Table ID
+	google.protobuf.Timestamp bet_ts = 4;
+}
+

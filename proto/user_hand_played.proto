@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+enum PokerHandRank {
+  NONE = 0;
+  ROYAL_FLUSH = 1;
+  STRAIGHT_FLUSH= 2;
+  FOUR_OF_A_KIND= 3;
+  FULL_HOUSE= 4;
+  FLUSH= 5;
+  STRAIGHT= 6;
+  THREE_OF_A_KIND= 7;
+  TWO_PAIR= 8;
+  PAIR= 9;
+  HIGH_CARD= 10;
+}
+
+message UserHandPlayed {
+  string pid = 1; // Hand ID
+  string uid = 2; // User ID
+  string tid = 3; // Table ID
+  google.protobuf.Timestamp played_at_ts = 4;
+  repeated string card_hand = 5;
+  PokerHandRank rank = 6;
+}
+
+
+
+
+
