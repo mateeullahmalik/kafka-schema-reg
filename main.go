@@ -51,8 +51,9 @@ func testLocal(obj *v1.UserAll, key string, addr string) {
 	p := kafka_event_bus.NewKafkaEventBus(addr)
 	post(p, obj, key)
 
+	time.Sleep(60 * time.Second)
 	// confirm delivery by producer  by consuming kafka topic
-	//consume(addr)
+	consume(addr)
 }
 
 func post(p bus.EventBus, obj *v1.UserAll, key string) {
