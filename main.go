@@ -34,7 +34,7 @@ func main() {
 	}
 
 	//addr := "127.0.0.1:9092"
-	addr := "SSL://b-1.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,SSL://b-3.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094"
+	addr := "SSL://b-1.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094"
 	testLocal(event, login.Uid, addr)
 
 }
