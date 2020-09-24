@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 	"os"
 	"os/signal"
@@ -19,7 +20,7 @@ import (
 )
 
 var (
-	kafkatopic = "vl-user-dev"
+	kafkatopic = "vl-user-modifybytes"
 )
 
 func main() {
@@ -56,7 +57,7 @@ func testLocal(obj *l1.UserAll, key string, addr string) {
 	p := kafka_event_bus.NewKafkaEventBus(addr)
 	post(p, obj, key)
 
-	time.Sleep(60 * time.Second)
+	time.Sleep(20 * time.Second)
 	// confirm delivery by producer  by consuming kafka topic
 	consume(addr)
 }
@@ -66,6 +67,14 @@ func post(p bus.EventBus, obj *l1.UserAll, key string) {
 	if err != nil {
 		panic("unable to marshal - err: " + err.Error())
 	}
+
+	schemaIDBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(schemaIDBytes, 12)
+
+	data[1] = schemaIDBytes[0]
+	data[2] = schemaIDBytes[1]
+	data[3] = schemaIDBytes[2]
+	data[4] = schemaIDBytes[3]
 
 	message := bus.KafkaMessage{
 		Topic:    kafkatopic,

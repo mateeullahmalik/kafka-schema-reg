@@ -14,7 +14,6 @@ package kafka_event_bus
 import (
 	"context"
 	"crypto/tls"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"strings"
@@ -82,17 +81,9 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 			})
 			defer writer.Close()
 
-			schemaIDBytes := make([]byte, 4)
-			binary.BigEndian.PutUint32(schemaIDBytes, event.SchemaID)
-
-			var payload []byte
-			payload = append(payload, byte(0))
-			payload = append(payload, schemaIDBytes...)
-			payload = append(payload, event.Data...)
-
 			msg := kafka.Message{
 				Key:   event.Key,
-				Value: payload,
+				Value: event.Data,
 			}
 
 			switch err := writer.WriteMessages(context.Background(), msg).(type) {
