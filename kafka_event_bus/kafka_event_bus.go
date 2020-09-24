@@ -100,6 +100,9 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 					"topic": event.Topic,
 					"key":   string(event.Key),
 				}).Info("kafka: delivered message successfully")
+			case kafka.WriteErrors:
+				log.WithError(err).WithFields(log.Fields{"topic": event.Topic, "err": err[0].Error(), "key": string(event.Key),
+					"broker": p.brokers}).Error("kafka: failed to deliver message ")
 			default:
 				log.WithError(err).WithFields(log.Fields{"topic": event.Topic, "key": string(event.Key),
 					"broker": p.brokers}).Error("kafka: failed to deliver message ")
