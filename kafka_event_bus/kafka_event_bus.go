@@ -70,9 +70,10 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 		// posting each message onto kafka
 		go func() {
 			writer := kafka.NewWriter(kafka.WriterConfig{
-				Brokers:  p.brokers,
-				Topic:    event.Topic,
-				Balancer: &kafka.LeastBytes{},
+				Brokers:      p.brokers,
+				Topic:        event.Topic,
+				Balancer:     &kafka.LeastBytes{},
+				RequiredAcks: 1,
 				Dialer: &kafka.Dialer{
 					TLS: &tls.Config{},
 				},
