@@ -45,7 +45,7 @@ func testLocal(obj *v1.UserAll, key string, addr string) {
 	// this will run kafka cluster locally on localhost:9092
 
 	// create topic if not exists
-	createTopic(addr, "vl-user-dev")
+	createTopic(addr, "test-ap")
 
 	// test producer
 	p := kafka_event_bus.NewKafkaEventBus(addr)
@@ -63,7 +63,7 @@ func post(p bus.EventBus, obj *v1.UserAll, key string) {
 	}
 
 	message := bus.KafkaMessage{
-		Topic:    "vl-user-dev",
+		Topic:    "test-ap",
 		SchemaID: 12,
 		Data:     data,
 		Key:      []byte(key),
@@ -136,7 +136,7 @@ func consume(addr string) {
 	}
 
 	fmt.Printf("Created Consumer %v\n", c)
-	err = c.SubscribeTopics([]string{"vl-user-dev"}, nil)
+	err = c.SubscribeTopics([]string{"test-ap"}, nil)
 	run := true
 
 	for run == true {
