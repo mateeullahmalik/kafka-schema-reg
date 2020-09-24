@@ -20,8 +20,8 @@ import (
 func main() {
 	// create dummy login event
 	login := &v1.UserLoggedIn{
-		Uid:       "test-user",
-		Ip:        "555.555.555.0000",
+		Uid:       "test-ap-user",
+		Ip:        "444.555.3333.0000",
 		Country:   "Wakanda",
 		Longitude: 321.2,
 		Latitude:  207.9,
