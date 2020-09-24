@@ -16,10 +16,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"strings"
 
-	kafka "github.com/segmentio/kafka-go"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
 // KafkaMessage is the expected argument of Send Method
@@ -32,21 +31,15 @@ type KafkaMessage struct {
 
 // kafkaEventBus implements EventBus interface
 type kafkaEventBus struct {
-	brokers []string
+	brokers string
 }
 
 // NewKafkaEventBus creates a new kafka producer and returns client as EventBus
 // A comma separated list of server addresses is to be passed in 'brokers'
 func NewKafkaEventBus(brokers string) EventBus {
-	var setBroks []string
-	broks := strings.Split(brokers, ",")
-	for i := 0; i < len(broks); i++ {
-		if strings.HasPrefix(broks[i], "SSL://") {
-			setBroks = append(setBroks, strings.TrimLeft(broks[i], "SSL://"))
-		}
-	}
+
 	return &kafkaEventBus{
-		brokers: setBroks,
+		brokers: brokers,
 	}
 }
 
@@ -66,38 +59,38 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 		// we do not want to disrupt the game flow
 		// hence, a separate goroutine is spawned for
 		// posting each message onto kafka
+		p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": p.brokers,
+			"security.protocol": "SSL"})
+		if err != nil {
+			panic(err)
+		}
+
+		defer p.Close()
+
+		schemaIDBytes := make([]byte, 4)
+		binary.BigEndian.PutUint32(schemaIDBytes, event.SchemaID)
+
+		var payload []byte
+		payload = append(payload, byte(0))
+		payload = append(payload, schemaIDBytes...)
+		payload = append(payload, event.Data...)
+
+		p.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: &event.Topic, Partition: kafka.PartitionAny},
+			Value:          payload,
+			Key:            event.Key,
+		}, nil)
+
 		go func() {
-			writer := kafka.NewWriter(kafka.WriterConfig{
-				Brokers:  p.brokers,
-				Topic:    event.Topic,
-				Balancer: &kafka.LeastBytes{},
-				// TO DO: Add Custom Dialer when cofigs available
-				// From PBI Infra to be able to use SSL. For now, its default
-			})
-			defer writer.Close()
-
-			schemaIDBytes := make([]byte, 4)
-			binary.BigEndian.PutUint32(schemaIDBytes, event.SchemaID)
-
-			var payload []byte
-			payload = append(payload, byte(0))
-			payload = append(payload, schemaIDBytes...)
-			payload = append(payload, event.Data...)
-
-			msg := kafka.Message{
-				Key:   event.Key,
-				Value: payload,
-			}
-
-			switch err := writer.WriteMessages(context.Background(), msg).(type) {
-			case nil:
-				log.WithFields(log.Fields{
-					"topic": event.Topic,
-					"key":   string(event.Key),
-				}).Info("kafka: delivered message successfully")
-			default:
-				log.WithError(err).WithFields(log.Fields{"topic": event.Topic, "key": string(event.Key),
-					"broker": p.brokers}).Error("kafka: failed to deliver message ")
+			for e := range p.Events() {
+				switch ev := e.(type) {
+				case *kafka.Message:
+					if ev.TopicPartition.Error != nil {
+						fmt.Printf("Delivery failed: %v\n", ev.TopicPartition)
+					} else {
+						fmt.Printf("Delivered message to %v\n", ev.TopicPartition)
+					}
+				}
 			}
 		}()
 	}
