@@ -13,6 +13,7 @@ package kafka_event_bus
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -71,6 +72,9 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 				Brokers:  p.brokers,
 				Topic:    event.Topic,
 				Balancer: &kafka.LeastBytes{},
+				Dialer: &kafka.Dialer{
+					TLS: &tls.Config{},
+				},
 				// TO DO: Add Custom Dialer when cofigs available
 				// From PBI Infra to be able to use SSL. For now, its default
 			})
