@@ -25,9 +25,9 @@ var (
 func main() {
 	// create dummy login event
 	login := &l0.UserLoggedIn{
-		Uid:       "test-user",
+		Uid:       "test-ap-user",
 		Ip:        "555.555.555.0000",
-		Country:   "Wakanda",
+		Country:   "Asgard",
 		Longitude: 321.2,
 		Latitude:  207.9,
 	}
