@@ -10,16 +10,21 @@ import (
 
 	"github.com/mateeullahmalik/kafka-schema-reg/kafka_event_bus"
 	bus "github.com/mateeullahmalik/kafka-schema-reg/kafka_event_bus"
-	v1 "github.com/mateeullahmalik/kafka-schema-reg/models/v1"
+	l0 "github.com/mateeullahmalik/kafka-schema-reg/models/v1/events_variantlabs_protobuf_l0"
+	l1 "github.com/mateeullahmalik/kafka-schema-reg/models/v1/events_variantlabs_protobuf_l1"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/golang/protobuf/proto"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
+var (
+	kafkatopic = "vl-user-dev"
+)
+
 func main() {
 	// create dummy login event
-	login := &v1.UserLoggedIn{
+	login := &l0.UserLoggedIn{
 		Uid:       "test-user",
 		Ip:        "555.555.555.0000",
 		Country:   "Wakanda",
@@ -27,8 +32,8 @@ func main() {
 		Latitude:  207.9,
 	}
 
-	event := &v1.UserAll{
-		OneofType: &v1.UserAll_Login{
+	event := &l1.UserAll{
+		OneofType: &l1.UserAll_Login{
 			Login: login,
 		},
 	}
@@ -39,13 +44,13 @@ func main() {
 
 }
 
-func testLocal(obj *v1.UserAll, key string, addr string) {
+func testLocal(obj *l1.UserAll, key string, addr string) {
 	// docker-compose.yml can be used to run kafka cluster locally in a quick way
 	// command: docker-compose up -d
 	// this will run kafka cluster locally on localhost:9092
 
 	// create topic if not exists
-	createTopic(addr, "test-ap")
+	createTopic(addr, kafkatopic)
 
 	// test producer
 	p := kafka_event_bus.NewKafkaEventBus(addr)
@@ -56,14 +61,14 @@ func testLocal(obj *v1.UserAll, key string, addr string) {
 	consume(addr)
 }
 
-func post(p bus.EventBus, obj *v1.UserAll, key string) {
+func post(p bus.EventBus, obj *l1.UserAll, key string) {
 	data, err := proto.Marshal(obj)
 	if err != nil {
 		panic("unable to marshal - err: " + err.Error())
 	}
 
 	message := bus.KafkaMessage{
-		Topic:    "test-ap",
+		Topic:    kafkatopic,
 		SchemaID: 12,
 		Data:     data,
 		Key:      []byte(key),
@@ -91,7 +96,18 @@ func createTopic(addr, topic string) {
 	if err != nil {
 		panic("ParseDuration(60s)")
 	}
-	results, err := a.CreateTopics(
+
+	results, err := a.DeleteTopics(ctx, []string{topic}, kafka.SetAdminOperationTimeout(maxDur))
+	if err != nil {
+		fmt.Printf("Failed to delete topics: %v\n", err)
+	}
+
+	// Print results
+	for _, result := range results {
+		fmt.Printf("%s\n", result)
+	}
+
+	results, err = a.CreateTopics(
 		ctx,
 		// Multiple topics can be created simultaneously
 		// by providing more TopicSpecification structs here.
@@ -136,7 +152,7 @@ func consume(addr string) {
 	}
 
 	fmt.Printf("Created Consumer %v\n", c)
-	err = c.SubscribeTopics([]string{"test-ap"}, nil)
+	err = c.SubscribeTopics([]string{kafkatopic}, nil)
 	run := true
 
 	for run == true {
@@ -155,8 +171,8 @@ func consume(addr string) {
 				c.Unassign()
 			case *kafka.Message:
 				message := e.Value
-				event := &v1.UserAll{
-					OneofType: &v1.UserAll_Login{},
+				event := &l1.UserAll{
+					OneofType: &l1.UserAll_Login{},
 				}
 				if err := proto.Unmarshal(message[5:], event); err != nil {
 					panic("unmarshal error: " + err.Error())
