@@ -61,7 +61,7 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 		// hence, a separate goroutine is spawned for
 		// posting each message onto kafka
 		p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": p.brokers,
-			"security.protocol": "SSL"})
+			"security.protocol": "SSL", "acks": "all"})
 		if err != nil {
 			panic(err)
 		}
