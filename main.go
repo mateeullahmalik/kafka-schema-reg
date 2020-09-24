@@ -34,7 +34,7 @@ func main() {
 	}
 
 	//addr := "127.0.0.1:9092"
-	addr := "b-1.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,b-2.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,b-3.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094"
+	addr := "SSL://b-1.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,SSL://b-2.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,SSL://b-3.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094"
 	testLocal(event, login.Uid, addr)
 
 }
@@ -45,7 +45,7 @@ func testLocal(obj *v1.UserAll, key string, addr string) {
 	// this will run kafka cluster locally on localhost:9092
 
 	// create topic if not exists
-	//createTopic(addr, "vl-user-dev")
+	createTopic(addr, "vl-user-dev")
 
 	// test producer
 	p := kafka_event_bus.NewKafkaEventBus(addr)
@@ -53,7 +53,7 @@ func testLocal(obj *v1.UserAll, key string, addr string) {
 
 	time.Sleep(60 * time.Second)
 	// confirm delivery by producer  by consuming kafka topic
-	//consume(addr)
+	consume(addr)
 }
 
 func post(p bus.EventBus, obj *v1.UserAll, key string) {

@@ -38,8 +38,15 @@ type kafkaEventBus struct {
 // NewKafkaEventBus creates a new kafka producer and returns client as EventBus
 // A comma separated list of server addresses is to be passed in 'brokers'
 func NewKafkaEventBus(brokers string) EventBus {
+	var setBroks []string
+	broks := strings.Split(brokers, ",")
+	for i := 0; i < len(broks); i++ {
+		if strings.HasPrefix(broks[i], "SSL://") {
+			setBroks = append(setBroks, strings.TrimLeft(broks[i], "SSL://"))
+		}
+	}
 	return &kafkaEventBus{
-		brokers: strings.Split(brokers, ","),
+		brokers: setBroks,
 	}
 }
 
