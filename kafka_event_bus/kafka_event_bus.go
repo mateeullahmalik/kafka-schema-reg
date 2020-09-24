@@ -16,6 +16,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
@@ -65,22 +66,6 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 			panic(err)
 		}
 
-		defer p.Close()
-
-		schemaIDBytes := make([]byte, 4)
-		binary.BigEndian.PutUint32(schemaIDBytes, event.SchemaID)
-
-		var payload []byte
-		payload = append(payload, byte(0))
-		payload = append(payload, schemaIDBytes...)
-		payload = append(payload, event.Data...)
-
-		p.Produce(&kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: &event.Topic, Partition: kafka.PartitionAny},
-			Value:          payload,
-			Key:            event.Key,
-		}, nil)
-
 		go func() {
 			for e := range p.Events() {
 				switch ev := e.(type) {
@@ -93,6 +78,27 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 				}
 			}
 		}()
+
+		fmt.Println("conn success")
+		schemaIDBytes := make([]byte, 4)
+		binary.BigEndian.PutUint32(schemaIDBytes, event.SchemaID)
+
+		var payload []byte
+		payload = append(payload, byte(0))
+		payload = append(payload, schemaIDBytes...)
+		payload = append(payload, event.Data...)
+
+		err = p.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: &event.Topic, Partition: kafka.PartitionAny},
+			Value:          payload,
+			Key:            event.Key,
+		}, nil)
+
+		if err != nil {
+			fmt.Println("unable to produce messgaes: - err: " + err.Error())
+		}
+
+		time.Sleep(10 * time.Second)
 	}
 
 	return nil
