@@ -97,7 +97,7 @@ func createTopic(addr, topic string) {
 		panic("ParseDuration(60s)")
 	}
 
-	results, err := a.DeleteTopics(ctx, []string{topic}, kafka.SetAdminOperationTimeout(maxDur))
+	/*results, err := a.DeleteTopics(ctx, []string{topic}, kafka.SetAdminOperationTimeout(maxDur))
 	if err != nil {
 		fmt.Printf("Failed to delete topics: %v\n", err)
 	}
@@ -106,8 +106,8 @@ func createTopic(addr, topic string) {
 	for _, result := range results {
 		fmt.Printf("%s\n", result)
 	}
-
-	results, err = a.CreateTopics(
+	*/
+	results, err := a.CreateTopics(
 		ctx,
 		// Multiple topics can be created simultaneously
 		// by providing more TopicSpecification structs here.
