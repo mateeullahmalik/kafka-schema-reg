@@ -27,8 +27,8 @@ func main() {
 	ts, _ := ptypes.TimestampProto(time.Now())
 	tb, _ := ptypes.TimestampProto(time.Now().AddDate(-20, 0, 0))
 	contact := &l0.UserContactInfo{
-		Email:  "jhondoe@gmail.com",
-		Mobile: 34422244,
+		Email:  "abc@variantlabs.com",
+		Mobile: 3999988,
 	}
 
 	Addr := &l0.UserAddressInfo{
@@ -39,10 +39,10 @@ func main() {
 	}
 	// create dummy login event
 	reg := &l0.UserRegistered{
-		Uid:           "test-reg-user",
-		FirstName:     "Jhon",
-		LastName:      "Doe",
-		Username:      "JhonDoe",
+		Uid:           "test-reg-user-2",
+		FirstName:     "variant",
+		LastName:      "labs",
+		Username:      "variantlabs",
 		DateOfBirth:   tb,
 		DateOfJoining: ts,
 		Language:      "en",
