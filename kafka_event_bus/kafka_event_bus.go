@@ -25,10 +25,11 @@ import (
 
 // KafkaMessage is the expected argument of Send Method
 type KafkaMessage struct {
-	Topic    string
-	Key      []byte
-	SchemaID uint32
-	Data     []byte
+	Topic          string
+	Key            []byte
+	SchemaID       uint32
+	Data           []byte
+	DescriptorVals []int
 }
 
 // kafkaEventBus implements EventBus interface
@@ -88,6 +89,12 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 			var payload []byte
 			payload = append(payload, byte(0))
 			payload = append(payload, schemaIDBytes...)
+
+			for i := 0; i < len(event.DescriptorVals); i++ {
+				payload = append(payload, byte(event.DescriptorVals[i]))
+				fmt.Println("added: ", byte(event.DescriptorVals[i]))
+			}
+
 			payload = append(payload, event.Data...)
 
 			msg := kafka.Message{

@@ -66,13 +66,16 @@ func post(p bus.EventBus, obj *l1.UserAll, key string) {
 	if err != nil {
 		panic("unable to marshal - err: " + err.Error())
 	}
+	_, vals := obj.Descriptor()
 
 	message := bus.KafkaMessage{
-		Topic:    kafkatopic,
-		SchemaID: 12,
-		Data:     data,
-		Key:      []byte(key),
+		Topic:          kafkatopic,
+		SchemaID:       12,
+		Data:           data,
+		Key:            []byte(key),
+		DescriptorVals: vals,
 	}
+
 	if err := p.Send(context.Background(), message); err != nil {
 		panic(err)
 	}
@@ -97,7 +100,7 @@ func createTopic(addr, topic string) {
 		panic("ParseDuration(60s)")
 	}
 
-	/*results, err := a.DeleteTopics(ctx, []string{topic}, kafka.SetAdminOperationTimeout(maxDur))
+	results, err := a.DeleteTopics(ctx, []string{topic}, kafka.SetAdminOperationTimeout(maxDur))
 	if err != nil {
 		fmt.Printf("Failed to delete topics: %v\n", err)
 	}
@@ -106,8 +109,8 @@ func createTopic(addr, topic string) {
 	for _, result := range results {
 		fmt.Printf("%s\n", result)
 	}
-	*/
-	results, err := a.CreateTopics(
+
+	results, err = a.CreateTopics(
 		ctx,
 		// Multiple topics can be created simultaneously
 		// by providing more TopicSpecification structs here.
