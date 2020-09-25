@@ -56,7 +56,7 @@ func testLocal(obj *l1.UserAll, key string, addr string) {
 	p := kafka_event_bus.NewKafkaEventBus(addr)
 	post(p, obj, key)
 
-	time.Sleep(60 * time.Second)
+	time.Sleep(20 * time.Second)
 	// confirm delivery by producer  by consuming kafka topic
 	consume(addr)
 }
@@ -110,7 +110,7 @@ func createTopic(addr, topic string) {
 		fmt.Printf("%s\n", result)
 	}
 
-	results, err = a.CreateTopics(
+	/*results, err = a.CreateTopics(
 		ctx,
 		// Multiple topics can be created simultaneously
 		// by providing more TopicSpecification structs here.
@@ -129,7 +129,7 @@ func createTopic(addr, topic string) {
 	for _, result := range results {
 		fmt.Printf("%s\n", result)
 	}
-
+	*/
 	a.Close()
 }
 
