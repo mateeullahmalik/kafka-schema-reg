@@ -15,6 +15,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
@@ -23,24 +24,40 @@ var (
 )
 
 func main() {
+	ts, _ := ptypes.TimestampProto(time.Now())
+	tb, _ := ptypes.TimestampProto(time.Now().AddDate(-20, 0, 0))
+	contact := &l0.UserContactInfo{
+		Email:  "jhondoe@gmail.com",
+		Mobile: 34422244,
+	}
+
+	Addr := &l0.UserAddressInfo{
+		AddressString: "31 Park Lane",
+		City:          "London",
+		State:         "",
+		Country:       "GB",
+	}
 	// create dummy login event
-	login := &l0.UserLoggedIn{
-		Uid:       "test-user",
-		Ip:        "555.555.555.0000",
-		Country:   "Wakanda",
-		Longitude: 321.2,
-		Latitude:  207.9,
+	reg := &l0.UserRegistered{
+		Uid:           "test-reg-user",
+		FirstName:     "Jhon",
+		LastName:      "Doe",
+		Username:      "JhonDoe",
+		DateOfBirth:   tb,
+		DateOfJoining: ts,
+		Language:      "en",
+		AccountStatus: l0.UserAccountStatus_ACTIVE,
+		Contact:       contact,
+		Address:       Addr,
 	}
 
 	event := &l1.UserAll{
-		OneofType: &l1.UserAll_Login{
-			Login: login,
-		},
+		OneofType: &l1.UserAll_Registration{},
 	}
 
 	//addr := "127.0.0.1:9092"
 	addr := "SSL://b-1.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,SSL://b-2.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094,SSL://b-3.data-infra-msk-de.647dgl.c4.kafka.ap-southeast-1.amazonaws.com:9094"
-	testLocal(event, login.Uid, addr)
+	testLocal(event, reg.Uid, addr)
 
 }
 
@@ -50,7 +67,7 @@ func testLocal(obj *l1.UserAll, key string, addr string) {
 	// this will run kafka cluster locally on localhost:9092
 
 	// create topic if not exists
-	createTopic(addr, kafkatopic)
+	//createTopic(addr, kafkatopic)
 
 	// test producer
 	p := kafka_event_bus.NewKafkaEventBus(addr)
@@ -58,7 +75,7 @@ func testLocal(obj *l1.UserAll, key string, addr string) {
 
 	time.Sleep(20 * time.Second)
 	// confirm delivery by producer  by consuming kafka topic
-	consume(addr)
+	//consume(addr)
 }
 
 func post(p bus.EventBus, obj *l1.UserAll, key string) {
