@@ -52,7 +52,9 @@ func main() {
 	}
 
 	event := &l1.UserAll{
-		OneofType: &l1.UserAll_Registration{},
+		OneofType: &l1.UserAll_Registration{
+			Registration: reg,
+		},
 	}
 
 	//addr := "127.0.0.1:9092"
