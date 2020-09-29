@@ -73,7 +73,7 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 		go func() {
 			// 2) Fetch the latest version of the schema, or create a new one if it is the first
 			schemaRegistryClient := srclient.CreateSchemaRegistryClient("http://data-infra-schema-reg-elb-dev-1632556799.ap-southeast-1.elb.amazonaws.com:8081")
-			schema, err := schemaRegistryClient.GetLatestSchema("demo-user-dev-value", false)
+			schema, err := schemaRegistryClient.GetLatestSchema("demo-user-dev", false)
 			if err != nil {
 				panic("err getting schema reg " + err.Error())
 			}
