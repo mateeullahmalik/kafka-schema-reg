@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/riferrei/srclient"
 	kafka "github.com/segmentio/kafka-go"
 	log "github.com/sirupsen/logrus"
 )
@@ -70,6 +71,22 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 		// hence, a separate goroutine is spawned for
 		// posting each message onto kafka
 		go func() {
+			// 2) Fetch the latest version of the schema, or create a new one if it is the first
+			schemaRegistryClient := srclient.CreateSchemaRegistryClient("http://data-infra-schema-reg-elb-dev-1632556799.ap-southeast-1.elb.amazonaws.com:8081")
+			schema, err := schemaRegistryClient.GetLatestSchema("demo-user-dev-value", false)
+			if err != nil {
+				panic("err getting schema reg " + err.Error())
+			}
+			if schema == nil {
+				/*schemaBytes, _ := ioutil.ReadFile("complexType.avsc")
+				schema, err = schemaRegistryClient.CreateSchema(topic, string(schemaBytes), srclient.Avro, false)
+				if err != nil {
+					panic(fmt.Sprintf("Error creating the schema %s", err))
+				}*/
+				panic("schema is nil")
+			}
+			event.SchemaID = uint32(schema.ID())
+			fmt.Println("schema id: ", event.SchemaID)
 			writer := kafka.NewWriter(kafka.WriterConfig{
 				Brokers:      p.brokers,
 				Topic:        event.Topic,
