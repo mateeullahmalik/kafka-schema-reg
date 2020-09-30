@@ -39,7 +39,7 @@ func main() {
 	}
 	// create dummy login event
 	reg := &l0.UserRegistered{
-		Uid:           "test-reg-user",
+		Uid:           "test-schema-id-reg-user",
 		FirstName:     "Jhon",
 		LastName:      "Doe",
 		Username:      "JhonDoe",
