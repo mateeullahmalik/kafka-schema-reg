@@ -18,8 +18,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
-	"github.com/riferrei/srclient"
+	"github.com/mateeullahmalik/go-schema-registry/srclient"
 	kafka "github.com/segmentio/kafka-go"
 	log "github.com/sirupsen/logrus"
 )
@@ -72,12 +73,17 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 		// posting each message onto kafka
 		go func() {
 			// 2) Fetch the latest version of the schema, or create a new one if it is the first
-			schemaRegistryClient := srclient.CreateSchemaRegistryClient("http://data-infra-schema-reg-elb-dev-1632556799.ap-southeast-1.elb.amazonaws.com:8081")
-			schema, err := schemaRegistryClient.GetLatestSchema("demo-user-dev", false)
+			schemaRegistryClient := srclient.NewSchemaRegistryClient(
+				srclient.SROpts{
+					URL:     "http://data-infra-schema-reg-elb-dev-1632556799.ap-southeast-1.elb.amazonaws.com:8081",
+					Timeout: 20 * time.Second,
+				},
+			)
+			schema, err := schemaRegistryClient.GetLatestSchema("demo-user-dev-value")
 			if err != nil {
 				panic("err getting schema reg " + err.Error())
 			}
-			if schema == nil {
+			if schema == nil || schema.ID == 0 {
 				/*schemaBytes, _ := ioutil.ReadFile("complexType.avsc")
 				schema, err = schemaRegistryClient.CreateSchema(topic, string(schemaBytes), srclient.Avro, false)
 				if err != nil {
@@ -85,7 +91,8 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 				}*/
 				panic("schema is nil")
 			}
-			event.SchemaID = uint32(schema.ID())
+			fmt.Println("ids ", schema.ID)
+			event.SchemaID = uint32(schema.ID)
 			fmt.Println("schema id: ", event.SchemaID)
 			writer := kafka.NewWriter(kafka.WriterConfig{
 				Brokers:      p.brokers,
