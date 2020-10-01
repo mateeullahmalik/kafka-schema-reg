@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	kafkatopic = "vl-user-dev"
+	kafkatopic = "vl.sgp.dev.users"
 )
 
 func main() {
@@ -89,7 +89,6 @@ func post(p bus.EventBus, obj *l1.UserAll, key string) {
 
 	message := bus.KafkaMessage{
 		Topic:          kafkatopic,
-		SchemaID:       12,
 		Data:           data,
 		Key:            []byte(key),
 		DescriptorVals: vals,

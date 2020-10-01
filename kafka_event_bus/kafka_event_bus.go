@@ -79,7 +79,7 @@ func (p *kafkaEventBus) Send(ctx context.Context, e ...interface{}) error {
 					Timeout: 20 * time.Second,
 				},
 			)
-			schema, err := schemaRegistryClient.GetLatestSchema("demo-user-dev-value")
+			schema, err := schemaRegistryClient.GetLatestSchema("vl.sgp.dev.users-value")
 			if err != nil {
 				panic("err getting schema reg " + err.Error())
 			}
