@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mateeullahmalik/kafka-schema-reg/kafka_event_bus"
 	bus "github.com/mateeullahmalik/kafka-schema-reg/kafka_event_bus"
 	l0 "github.com/mateeullahmalik/kafka-schema-reg/models/v1/events_variantlabs_protobuf_l0"
 	l1 "github.com/mateeullahmalik/kafka-schema-reg/models/v1/events_variantlabs_protobuf_l1"
@@ -72,12 +71,12 @@ func testLocal(obj *l1.UserAll, key string, addr string) {
 	//createTopic(addr, kafkatopic)
 
 	// test producer
-	p := kafka_event_bus.NewKafkaEventBus(addr)
-	post(p, obj, key)
+	//p := kafka_event_bus.NewKafkaEventBus(addr)
+	//post(p, obj, key)
 
-	time.Sleep(20 * time.Second)
+	//time.Sleep(20 * time.Second)
 	// confirm delivery by producer  by consuming kafka topic
-	//consume(addr)
+	consume(addr)
 }
 
 func post(p bus.EventBus, obj *l1.UserAll, key string) {
@@ -192,6 +191,7 @@ func consume(addr string) {
 				c.Unassign()
 			case *kafka.Message:
 				message := e.Value
+				fmt.Println(message)
 				event := &l1.UserAll{
 					OneofType: &l1.UserAll_Login{},
 				}
