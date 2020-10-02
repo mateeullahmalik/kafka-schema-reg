@@ -195,7 +195,7 @@ func consume(addr string) {
 				event := &l1.UserAll{
 					OneofType: &l1.UserAll_Login{},
 				}
-				if err := proto.Unmarshal(message[5:], event); err != nil {
+				if err := proto.Unmarshal(message[6:], event); err != nil {
 					panic("unmarshal error: " + err.Error())
 				}
 
