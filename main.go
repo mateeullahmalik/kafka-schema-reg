@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	kafkatopic = "vl.sgp.dev.users"
+	kafkatopic = "vl.sgp.qa.users"
 )
 
 func main() {
